@@ -31,6 +31,9 @@ topics = [
 results = {}
 current_index = 0
 
+print("")
+print("")
+print("")
 print("--- UI COORDINATE CAPTURE TOOL ---")
 print(f"Next Target: {topics[current_index]}")
 

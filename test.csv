@@ -1,7 +1,0 @@
-﻿Label,Measurement,Measurement Unit,Count,Subject
-corridor east_l1,2600.7,sf,0,Area Measurement
-corridor east_l1_pop,4,Count,4,Count Measurement Purple
-corridor east_l1_wall 270,74.6641,"ft' in""",0,Length Measurement
-corridor east_l1_wall 270_door h8,6.0089,"ft' in""",0,Length Measurement Blue
-corridor east_l1_wall 270_win h6 x2,5.5111,"ft' in""",0,Length Measurement Blue
-corridor east_l1_wall 270_win h6 x3,2.3822,"ft' in""",0,Length Measurement Blue

@@ -3,7 +3,6 @@
 split_chr = "_"
 speed = 0.05 #0.1
 
-
 import sys
 from pathlib import Path
 import time
@@ -31,7 +30,6 @@ with open("wwr.yaml", "r") as f:
     else:
         del wwr
 
-
 ### starting the code
 for i in range(5, 0, -1):
         print(f"Starting in: {i}...", end="\r")
@@ -48,13 +46,11 @@ def update_field(input_button, input_text, mod=my_mod, speed=speed, lookup_table
     pyautogui.click(x=x, y=y, clicks=1, interval=speed)
     time.sleep(speed)
 
-    # pyautogui.hotkey(mod, 'a')
-    # pyautogui.press('backspace')
     pyautogui.press('right', presses=15, interval=0.001)
-    # pyautogui.press('backspace', presses=20, interval=0.001)
+    pyautogui.press('backspace', presses=20, interval=0.001)
 
     pyautogui.write(input_text, interval=speed)
-    pyautogui.press('return')
+    # pyautogui.press('return')
 
 def click_field(input_button, lookup_table=bm):
     print("clicking "+ str(input_button))
@@ -86,8 +82,12 @@ rooms = rooms[~rooms['Measurement Unit'].str.contains('count', case=False, na=Fa
 rooms = rooms.reset_index(drop=True)
 n_rooms = len(rooms)
 
+print("")
+print("")
+print("")
+
 for i in range(0, len(rooms)):
-    print(" ")
+    print("")
     click_field("single_sheet_tab_button")
     click_field("single_sheet_new_room_button")
 
@@ -195,5 +195,6 @@ for i in range(0, len(rooms)):
 
     tdf = None
 
+print("")
 total_seconds = time.perf_counter() - start_time
 print(f"Total execution time: {timedelta(seconds=total_seconds)}")

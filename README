@@ -1,0 +1,43 @@
+Hi!
+Welcome to BlueBeam to Trace700 automation.
+Made by KF!
+
+1. installation and calibration this step once and if you have done so, skip to step 2
+1.1. python installation
+    - go to installation folder
+    - install python
+    - run "install_libraries.py"
+1.2. calibrate mouse location of buttons/input fields in trace 700
+    - go to tools folder
+    - have your Trace700 program open and ready
+    - got to Rooms in Trace 700
+    - drag and set you trace program anywhere on your screen that is going to stay for ALL the next steps and NOT covered by any other programs
+    - run "create_button_map.py"
+    - the program asks you to click on different buttons on Trace700 to calibrate itself
+    - when clicking is done, a file called "button_map.yaml" is created; copy it to the main folder
+
+2. drop your BlueBeam output that is a CSV file in the folder
+3. run "main.py"
+4. enjoy and seep your coffee
+
+
+Looking for more?
+- This program can do the following:
+  - create rooms
+    - adjust room's size
+    - adjust room's multiplier, e.g., x3
+  - create walls
+    - adjust wall's length
+    - adjust wall's orientation
+  - create windows
+    - based on single windows
+      - adjust window's size
+      - adjust window's quantity, e.g., x2
+    - based on window to wall ratio (wwr), use wwr.yaml settings!
+  - create doors
+    - adjust door's size
+    - adjust door's quantity, e.g., x2
+
+- It has a test file, give it a try
+
+
