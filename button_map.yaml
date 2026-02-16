@@ -1,0 +1,69 @@
+single_sheet_tab_button:
+- 1399
+- 730
+single_sheet_new_room_button:
+- 1399
+- 730
+single_sheet_room_description_inputfield:
+- 1399
+- 730
+single_sheet_floor_length_inputfield:
+- 1399
+- 730
+single_sheet_floor_width_inputfield:
+- 1399
+- 730
+single_sheet_internal_loads_people_inputfield:
+- 1399
+- 730
+single_sheet_internal_loads_people_dropdown_arrow:
+- 1399
+- 730
+single_sheet_internal_loads_people_dropdown_people:
+- 1399
+- 730
+rooms_tab_button:
+- 1399
+- 730
+rooms_duplicate_rooms_per_zone_inputfield:
+- 1399
+- 730
+walls_tab_button:
+- 1399
+- 730
+walls_new_wall_button:
+- 1399
+- 730
+walls_wall_length_inputfield:
+- 1399
+- 730
+walls_wall_direction_inputfield:
+- 1399
+- 730
+walls_new_opening_button:
+- 1399
+- 730
+walls_openings_window_checkbox:
+- 1399
+- 730
+walls_openings_door_checkbox:
+- 1399
+- 730
+walls_openings_wall_area_checkbox:
+- 1399
+- 730
+walls_openings_wall_area_inputfield:
+- 1399
+- 730
+walls_openings_length_checkbox:
+- 1399
+- 730
+walls_openings_length_inputfield:
+- 1399
+- 730
+walls_openings_height_inputfield:
+- 1399
+- 730
+walls_openings_quantity_inputfield:
+- 1399
+- 730
