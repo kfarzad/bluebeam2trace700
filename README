@@ -32,8 +32,9 @@ Looking for more?
   - create windows
     - based on single windows
       - adjust window's size
+        - adjust width/length to the closest window schedule
       - adjust window's quantity, e.g., x2
-    - based on window to wall ratio (wwr), use wwr.yaml settings!
+    - based on window to wall ratios (wwr), use window_to_wall_ratios.yaml settings!
   - create doors
     - adjust door's size
     - adjust door's quantity, e.g., x2

@@ -15,20 +15,33 @@ import pyautogui
 import pandas as pd
 
 ### read the settings
-with open("button_map.yaml", "r") as f:
+with open("tools/button_map.yaml", "r") as f:
     bm = yaml.safe_load(f)
 
-with open("wwr.yaml", "r") as f:
+with open("window_to_wall_ratios.yaml", "r") as f:
     wwr = yaml.safe_load(f)
     use_wwr = wwr["use_wwr"]
     if use_wwr:
-        print('using wwr')
+        print('using window to wall ratios')
         wwr.pop("use_wwr")
         print(wwr)
-        #example
-        # print(float(wwr["wwr"+"010"]))
+        # example: print(float(wwr["wwr"+"010"]))
     else:
         del wwr
+
+with open("window_schedule.yaml", "r") as f:
+    win_sch = yaml.safe_load(f)
+    use_win_sch = win_sch["use_win_sch"]
+    if use_win_sch:
+        print('using window schedule')
+        correct_win_height = win_sch["correct_win_height"]
+
+        win_sch = win_sch["win_sch"]
+        
+        win_sch_heights = [h['H'] for h in win_sch.values()]
+        win_sch_widths = [w['W'] for w in win_sch.values()]
+    else:
+        del win_sch
 
 ### starting the code
 for i in range(5, 0, -1):
@@ -166,6 +179,8 @@ for i in range(0, len(rooms)):
                                 print('win num: ' + str(win_num))
                                 update_field("walls_openings_quantity_inputfield", win_num)
                     win_length = tdf.at[ii,'Measurement']
+                    if correct_win_height:
+                        win_length = min(win_sch_widths, key=lambda x: abs(x - win_length))
                     print('win length: ' + str(win_length))
                     update_field("walls_openings_length_inputfield", win_length)
 

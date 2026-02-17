@@ -1,0 +1,10 @@
+use_win_sch: False
+correct_win_height: False
+
+win_sch:
+  window1:
+    H: 6
+    W: 6
+  Window2:
+    H: 6
+    W: 3.2
