@@ -3,6 +3,8 @@ from pynput import mouse
 
 # 2. Define the topics to locate
 topics = [
+"trace_program_logo",
+"create_rooms",
 "single_sheet_tab_button",
 "single_sheet_new_room_button",
 "single_sheet_room_description_inputfield",

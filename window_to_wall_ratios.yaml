@@ -3,6 +3,6 @@ use_wwr: False # True or False
 
 # use the following examples and write down your wwr fractions
 # the three digits are the direction of the wall
-wwr009: 0.59
-wwr150: 0.44
+wwr007: 0.59
+wwr070: 0.44
 wwr270: 0.40

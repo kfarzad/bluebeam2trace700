@@ -1,0 +1,23 @@
+use_opening_schedule: False
+
+correct_window_length: False
+correct_door_length: False
+
+default_window_height: 6
+default_door_height: 8
+
+window_schedule:
+  window1:
+    H: 6
+    W: 6
+  window2:
+    H: 6
+    W: 3.2
+
+door_schedule:
+  door1:
+    H: 3
+    W: 8
+  door2:
+    H: 5
+    W: 10
