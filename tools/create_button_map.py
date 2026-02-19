@@ -3,8 +3,8 @@ from pynput import mouse
 
 # 2. Define the topics to locate
 topics = [
-"trace_program_logo",
-"create_rooms",
+"trace_logo_on_program_title_bar",
+"create_rooms_house_icon",
 "single_sheet_tab_button",
 "single_sheet_new_room_button",
 "single_sheet_room_description_inputfield",
@@ -37,6 +37,7 @@ print("")
 print("")
 print("")
 print("--- UI COORDINATE CAPTURE TOOL ---")
+print("")
 print(f"Next Target: {topics[current_index]}")
 
 def on_click(x, y, button, pressed):
@@ -45,13 +46,14 @@ def on_click(x, y, button, pressed):
         label = topics[current_index]
         results[label] = [int(x), int(y)]
         print(f"Captured {label}: [{int(x)}, {int(y)}]")
+        print("")
         
         current_index += 1
         
         if current_index < len(topics):
             print(f"Next Target: {topics[current_index]}")
         else:
-            print("\nAll coordinates captured!")
+            print("All coordinates captured!")
             return False # Stops the listener
 
 # 3. Start Listening
@@ -62,4 +64,5 @@ with mouse.Listener(on_click=on_click) as listener:
 with open("button_map.yaml", "w") as f:
     yaml.dump(results, f, sort_keys=False)
 
-print("\nFile 'button_map.yaml' has been created successfully.")
+print("File 'button_map.yaml' has been created successfully.")
+input("press ENTER to exit the program")

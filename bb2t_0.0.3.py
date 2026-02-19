@@ -1,7 +1,10 @@
 ### |<|= =|>| ###
 
+### To be developed
+## 1. insert wall names, JG
+
 split_chr = "_"
-speed = 0.1 #0.1
+speed = 0.01 # 0.1
 
 ### Don't mess around below this line
 import sys
@@ -51,7 +54,8 @@ def countdown(seconds=5, message="in"):
 yaml_file_name = "button_map.yaml"
 yaml_paths = [
     Path(".") / yaml_file_name,
-    Path("./tools") / yaml_file_name
+    Path("./tools") / yaml_file_name,
+    Path("./settings") / yaml_file_name
 ]
 yaml_path = next((p for p in yaml_paths if p.is_file()), None)
 
@@ -64,7 +68,7 @@ else:
     with open(str(yaml_path), "r") as f:
         bm = yaml.safe_load(f)
 
-with open("window_to_wall_ratios.yaml", "r") as f:
+with open("settings/window_to_wall_ratios.yaml", "r") as f:
     wwr = yaml.safe_load(f)
     use_wwr = wwr["use_wwr"]
     if use_wwr:
@@ -75,7 +79,7 @@ with open("window_to_wall_ratios.yaml", "r") as f:
     else:
         del wwr
 
-with open("opening_schedule.yaml", "r") as f:
+with open("settings/opening_schedule.yaml", "r") as f:
     opn_sch = yaml.safe_load(f)
     use_opn_sch = opn_sch["use_opening_schedule"]
     if use_opn_sch:
@@ -106,15 +110,12 @@ def update_field(input_button, input_text, mod=my_mod, speed=speed, lookup_table
     print("updating "+ str(input_button) + " to "+ str(input_text))
     x, y = lookup_table[input_button]
     input_text = str(input_text)
-
     pyautogui.click(x=x, y=y, clicks=1, interval=speed)
     time.sleep(speed)
-
     pyautogui.press('right', presses=15, interval=0.001)
     pyautogui.press('backspace', presses=20, interval=0.001)
-
     pyautogui.write(input_text, interval=speed)
-    # pyautogui.press('return')
+
 
 def click_field(input_button, lookup_table=bm):
     print("clicking "+ str(input_button))
@@ -154,15 +155,47 @@ df = pd.read_csv(str(input_file[0]))
 df = df.dropna(subset=['Label'])
 df = df[~df['Label'].str.contains('guide', case=False, na=False)]
 df = df.reset_index(drop=True)
-df = df.sort_values(by=["Label","Count"],ascending=[True, True])
+df = df.sort_values(by=["Label"],ascending=[True])
 df['Label_Original'] = df['Label']  # Save for Trace700
 df['Label'] = df['Label'].str.lower() # Lowercase for logic
 df = round(df,1)
 
+cols = df.columns.str.strip()
+if not 'Measurement' in cols:
+    if 'Area' in cols and 'Length' not in cols and 'Count' not in cols:
+        df['Measurement'] = df['Area']
+        if 'Area Unit' in cols:
+            df['Measurement Unit'] = df['Area Unit']
+    if 'Length' in cols and 'Area' not in cols and 'Count' not in cols:
+        df['Measurement'] = df['Length']
+        if 'Length Unit' in cols:
+            df['Measurement Unit'] = df['Length Unit']
+    if 'Count' in cols and 'Area' not in cols and 'Length' not in cols:
+        df['Measurement'] = df['Count']
+        if 'Count Unit' in cols:
+            df['Measurement Unit'] = df['Count Unit']    
+
+    ### TO BE DEVELOPED
+    # if 'Area' in cols and 'Length' in cols and 'Count' not in cols:
+    #     df['Measurement'] = df['Area']
+    #     if 'Area Unit' in cols:
+    #         df['Measurement Unit'] = df['Area Unit']
+    # if 'Length' in cols and 'Count' in cols and 'Count' not in cols:
+    #     df['Measurement'] = df['Length']
+    #     if 'Length Unit' in cols:
+    #         df['Measurement Unit'] = df['Length Unit']
+    # if 'Count' in cols and 'Area' in cols and 'Length' not in cols:
+    #     df['Measurement'] = df['Count']
+    #     if 'Measurement Unit' in cols:
+    #         df['Count Unit'] = df['Count Unit']
+
+    # if 'Area' in cols and 'Length' in cols and 'Count' in cols:
+    #     df['Measurement'] = df['Area']
+    #     if 'Area Unit' in cols:
+    #         df['Measurement Unit'] = df['Area Unit']
+
 rooms = df
-# rooms = rooms[~rooms['Label'].str.contains('pop|wall|window', case=False, na=False)]
 rooms = rooms[~rooms['Label'].str.split(split_chr).str[1:].str.join(split_chr).str.contains('pop|wall|window|win|zone', case=False, na=False)]
-rooms = rooms[~rooms['Measurement Unit'].str.contains('count', case=False, na=False)]
 rooms = rooms.reset_index(drop=True)
 n_rooms = len(rooms)
 check_long_names(rooms['Label'])
@@ -192,8 +225,8 @@ print("")
 print("")
 print("")
 
-click_field("trace_program_logo")
-click_field("create_rooms")
+click_field("trace_logo_on_program_title_bar")
+click_field("create_rooms_house_icon")
 
 for i in range(0, len(rooms)):
     print("")
@@ -214,10 +247,9 @@ for i in range(0, len(rooms)):
         click_field("rooms_tab_button")
         update_field("rooms_duplicate_rooms_per_zone_inputfield", room_num)
 
-    # get details of the room
+    ### get details of the room
     search_pattern = r'^' + re.escape(str(rooms.at[i,'Label'])) + r'\s*(' + re.escape(split_chr) + r'|$)'
     tdf = df[df["Label"].str.contains(search_pattern, regex=True, na=False)]
-    # tdf = df[df["Label"].str.contains(rooms.at[i,'Label'], na=False)]
     tdf = tdf.reset_index(drop=True)
 
     if len(tdf)>1:
@@ -226,9 +258,9 @@ for i in range(0, len(rooms)):
             print(label)
             label_parts = label.split(split_chr)
 
-            #pop
+            ### pop
             if 'pop' in label:
-                room_pop = tdf.at[ii,'Count']
+                room_pop = tdf.at[ii,'Measurement']
                 print('people: ' + str(room_pop))
                 click_field("single_sheet_tab_button")
                 click_field("single_sheet_internal_loads_people_dropdown_arrow")
@@ -237,7 +269,7 @@ for i in range(0, len(rooms)):
 
                 room_pop = None
 
-            #wall
+            ### wall
             if 'wall' in label and not any(x in label for x in ('win', 'window', 'door')):
                 click_field("walls_tab_button")
                 click_field("walls_new_wall_button")
@@ -259,7 +291,7 @@ for i in range(0, len(rooms)):
 
                 iii = wall_length = p = s = wall_direction = wall_length = None
 
-            # single windows
+            ### single windows
             if not use_wwr:
                 if any(x in label for x in ('win', 'window')):
                     click_field("walls_new_opening_button")
@@ -288,7 +320,7 @@ for i in range(0, len(rooms)):
 
                     iii = p = win_height = win_num = win_length = None
 
-            #door
+            ### door
             if 'door' in label:
                 click_field("walls_new_opening_button")
                 click_field("walls_openings_door_checkbox")
