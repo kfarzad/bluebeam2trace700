@@ -3,9 +3,6 @@ use_opening_schedule: False
 correct_window_length: False
 correct_door_length: False
 
-default_window_height: 6
-default_door_height: 8
-
 window_schedule:
   window1:
     H: 6

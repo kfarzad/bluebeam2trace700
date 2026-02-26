@@ -1,0 +1,192 @@
+calculate_ventilation: False
+
+# definition table:
+Artclassroom:
+- Artclassroom
+Auditoriumseatingarea:
+- Auditoriumseatingarea
+Bankvault/safedeposit:
+- Bankvault
+- safedeposit
+Banksorbanklobbies:
+- Banksorbanklobbies
+Barbershop:
+- Barbershop
+Barrackssleepingareas:
+- Barrackssleepingareas
+Bars/cocktaillounges:
+- Bars
+- cocktaillounges
+Beautyandnailsalon:
+- Beautyandnailsalon
+Bedroom/livingroom:
+- Bedroom
+- livingroom
+Booking/waiting:
+- Booking
+- waiting
+Bowlingalley(seating):
+- Bowlingalley
+Breakrooms(general):
+- Breakrooms-general
+Breakrooms(officebuildings):
+- Breakrooms-office
+Cafeteria/fastfooddining:
+- Cafeteria
+- fastfooddining
+Cell:
+- Cell
+Classrooms(age9plus):
+- Classrooms(age9plus)
+Classrooms(ages5-8):
+- Classrooms(ages5-8)
+Coffeestations:
+- Coffeestations
+Coin-operatedlaundries:
+- Coin-operatedlaundries
+Commoncorridors:
+- Commoncorridors
+Computer(notprinting):
+- Computer
+Computerlab:
+- Computerlab
+Conference/meeting:
+- Conference
+- meeting
+Corridors:
+- Corridors
+Courtrooms:
+- Courtrooms
+Dayroom:
+- Dayroom
+Daycare(throughage4):
+- Daycare(throughage4)
+Daycaresickroom:
+- Daycaresickroom
+Disco/dancefloors:
+- Disco
+- dancefloors
+Dwellingunit:
+- Dwellingunit
+Dwellingunit- studioorone- bedroom:
+- 
+Dwellingunit- three- bedroom:
+- 
+Dwellingunit- two- bedroom:
+- 
+Electricalequipmentrooms:
+- 
+Elevatormachinerooms:
+- 
+Freezerandrefrigeratedspaces<50degF:
+- 
+Gamblingcasinos:
+- 
+Gamearcades:
+- 
+"Generalmanufacturing(excludesheavy:
+- 
+industrialandprocessesusingchemicals)":
+- 
+Guardstations:
+- 
+Gym,sportsarena(playarea):
+- 
+Healthclub/aerobics:
+- 
+Healthclub/weight:
+- 
+Kitchen(cooking):
+- 
+Laundryroomswithindwellingunits:
+- 
+Laundryrooms,central:
+- 
+Lectureclassroom:
+- Lectureclassroom
+Lecturehall(fixedseats):
+- Lecturehall
+Legislativechambers:
+- Legislativechambers
+Libraries:
+- Libraries
+Lobbies:
+- Lobbies
+Lobbies/prefunction:
+- Lobbies-prefunction
+Mainentrylobbies:
+- Mainentrylobbies
+Mallcommonareas:
+- Mallcommonareas
+Mediacenter:
+- Mediacenter
+Multi-purposeassembly:
+- Multi-purposeassembly
+Multi-useassembly:
+- Multi-useassembly
+Museums(children's):
+- Museums-children
+Museums/galleries:
+- Museums
+- galleries
+Music/theater/dance:
+- Music
+- theater
+- dance
+Occupiablestorageroomsfordrymaterials:
+- Occupiablestorageroomsfordrymaterials
+Occupiablestorageroomsforliquidsorgels:
+- Occupiablestorageroomsforliquidsorgels
+Officespace:
+- Officespace
+Petshops(animalareas):
+- Petshops
+Pharmacy(prep,area):
+- Pharmacy
+Photostudios:
+- Photostudios
+Placesofreligiousworship:
+- Placesofreligiousworship
+Receptionareas:
+- Receptionareas
+Restaurantdiningrooms:
+- Restaurantdiningrooms
+Sales:
+- Sales
+Sciencelaboratories:
+- Sciencelaboratories
+Shipping/receiving:
+- Shipping
+- receiving
+Sorting/packing/lightassembly:
+- Sorting
+- packing
+- lightassembly
+Spectatorareas:
+- Spectatorareas
+Sportsarena(playarea):
+- Sportsarena
+Stages/studios:
+- Stages
+- studios
+Storagerooms:
+- Storagerooms
+Supermarket:
+- Supermarket
+Swimming(pool&deck):
+- Swimming
+Telephone/dataentry:
+- Telephone
+- dataentry
+Telephoneclosets:
+- Telephoneclosets
+Transportationwaiting:
+- Transportationwaiting
+University/collegelaboratories:
+- University
+- collegelaboratories
+Warehouses:
+- Warehouses
+Wood/metalshop:
+- Wood
+- metalshop

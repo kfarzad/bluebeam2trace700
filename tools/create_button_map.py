@@ -20,6 +20,7 @@ topics = [
 "walls_wall_length_inputfield",
 "walls_wall_direction_inputfield",
 "walls_new_opening_button",
+"error_message_ok_button",
 "walls_openings_window_checkbox",
 "walls_openings_door_checkbox",
 "walls_openings_wall_area_checkbox",
