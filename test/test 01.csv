@@ -1,9 +1,0 @@
-Label,Measurement
-b1 l1 corridor east,2600.7
-b1 l1 corridor east_pop,4
-b1 l1 corridor east_wall 270,74.6641
-b1 l1 corridor east_wall 270_door,4
-b1 l1 corridor east_wall 270_door h8,6.0089
-b1 l1 corridor east_wall 270_win x2,5.5111
-b1 l1 corridor east_wall 270_win h6 x3,2.3822
-b1 l1 corridor west x2,1000

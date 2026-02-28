@@ -2,12 +2,20 @@
 
 ### To be developed
 ## 1. insert wall names, JG
+###
 
+### some settings to consider
 split_chr = "_"
 speed = 0.01 # 0.1
+start_delay = 5 # in seconds
+
+### test ground
 test_mode = False
+test_file_name = "test_"+ "wd_sch" + ".csv"
 
 ### Don't mess around below this line
+print("")
+
 import sys
 from pathlib import Path
 import time
@@ -46,29 +54,37 @@ collector = WarningCollector()
 my_mod = 'command' if platform.system() == 'Darwin' else 'ctrl'
 
 ### functions
-def countdown(seconds=5, message="in"):
+def countdown(seconds=3, message="in"):
     for s in range(seconds, 0, -1):
             print(f"{message}: {s}s", end="\r")
             time.sleep(1)
 
 ### read the settings
-yaml_file_name = "button_map.yaml"
-yaml_paths = [
-    Path(".") / yaml_file_name,
-    Path("./tools") / yaml_file_name,
-    Path("./settings") / yaml_file_name
-]
-yaml_path = next((p for p in yaml_paths if p.is_file()), None)
+base_dir = Path(__file__).parent.resolve()
 
-if yaml_path is None:
-    print("button_map.yaml file missing\ngo to tools folder and use create_button_map.py to calibrate your program")
-    input("press ENTER to exit the program")
-    sys.exit(1)
+if not test_mode:
+    yaml_file_name = "button_map.yaml"
+    yaml_paths = [
+        base_dir / yaml_file_name,
+        base_dir / "tools" / yaml_file_name,
+        base_dir / "settings" / yaml_file_name
+    ]
+    yaml_path = next((p for p in yaml_paths if p.is_file()), None)
+
+    if yaml_path is None:
+        print("button_map.yaml file missing\ngo to tools folder and use create_button_map.py to calibrate your program")
+        input("press ENTER to exit the program")
+        sys.exit(1)
+    else:
+        with open(str(yaml_path), "r") as f:
+            bm = yaml.safe_load(f)
 else:
+    yaml_file_name = "button_map_kf.yaml"
+    yaml_path = str(base_dir) + "/settings/kf/" + yaml_file_name
     with open(str(yaml_path), "r") as f:
         bm = yaml.safe_load(f)
 
-with open("settings/window_to_wall_ratios.yaml", "r") as f:
+with open(base_dir / "settings/window_to_wall_ratios.yaml", "r") as f:
     wwr = yaml.safe_load(f)
     use_wwr = wwr["use_wwr"]
     if use_wwr:
@@ -79,35 +95,53 @@ with open("settings/window_to_wall_ratios.yaml", "r") as f:
     else:
         del wwr
 
-with open("settings/opening_schedule.yaml", "r") as f:
+with open(base_dir / "settings/opening_schedule.yaml", "r") as f:
     opn_sch = yaml.safe_load(f)
-    use_opn_sch = opn_sch["use_opening_schedule"]
-    if use_opn_sch:
+    use_win_sch = opn_sch["use_window_schedule"]
+    use_door_sch = opn_sch["use_door_schedule"]
+    if use_win_sch or use_door_sch:
+        use_window_type = opn_sch["use_window_type"]
+        use_door_type = opn_sch["use_door_type"]
         correct_win_length = opn_sch["correct_window_length"]
-        if correct_win_length:
-            print('using window schedule')
-            window_schedule = opn_sch["win_sch"]
-            
-            win_sch_heights = [h['H'] for h in window_schedule.values()]
-            win_sch_widths = [w['W'] for w in window_schedule.values()]
-
         correct_door_length = opn_sch["correct_door_length"]
+
+        if use_window_type and correct_win_length:
+            print("you cannot use both window length correction and window type selection together")
+            input("press ENTER to exit the program")
+            sys.exit(1)
+        if use_door_type and correct_door_length:
+            print("you cannot use both door length correction and door type selection together")
+            input("press ENTER to exit the program")
+            sys.exit(1)
+
+        if correct_win_length:
+            print('using window schedule for length correction')
+            win_sch = opn_sch["window_schedule"]
+            win_sch_heights = [h['H'] for h in win_sch.values()]
+            win_sch_widths = [w['W'] for w in win_sch.values()]
+        elif use_window_type:
+            print('using window schedule for window type')
+            win_sch = opn_sch["window_schedule"]
+            win_sch = {k.lower(): v for k, v in win_sch.items()}
+        
         if correct_door_length:
             print('using door schedule')
-            door_schedule = opn_sch["door_sch"]
-            
-            door_sch_heights = [h['H'] for h in door_schedule.values()]
-            door_sch_widths = [w['W'] for w in door_schedule.values()]
-
+            door_sch = opn_sch["door_schedule"]
+            door_sch_heights = [h['H'] for h in door_sch.values()]
+            door_sch_widths = [w['W'] for w in door_sch.values()]
+        elif use_door_type:
+            print('using door schedule for door type')
+            door_sch = opn_sch["door_schedule"]
+            door_sch = {k.lower(): v for k, v in door_sch.items()}
     else:
         correct_win_length = False
         correct_door_length = False
 
-with open("settings/default_values.yaml", "r") as f:
+with open(base_dir / "settings/default_values.yaml", "r") as f:
     default_values = yaml.safe_load(f)
     win_def_height = default_values["default_window_height"]
     door_def_height = default_values["default_door_height"]
-    wall_def_orient = default_values["default_wall_orientation"]
+    # wall_def_orient = default_values["default_wall_orientation"]
 
 ### functions
 def update_field(input_button, input_text, mod=my_mod, speed=speed, lookup_table=bm):
@@ -121,10 +155,8 @@ def update_field(input_button, input_text, mod=my_mod, speed=speed, lookup_table
         pyautogui.press('backspace', presses=20, interval=0.001)
         pyautogui.write(input_text, interval=speed)
 
-
 def click_field(input_button, lookup_table=bm):
-    if not test_mode:
-        print("clicking "+ str(input_button))
+    print("clicking "+ str(input_button))
     x, y = lookup_table[input_button]
     if not test_mode:
         pyautogui.click(x=x, y=y, clicks=1, interval=speed)
@@ -181,12 +213,14 @@ def check_smaller_than_1_1(measurement, multiplier=1):
 
 ### starting the code
 if not test_mode:
-    countdown(5, "Starting in")
+    countdown(start_delay, "Starting in")
 
 start_time = time.perf_counter()
 
-script_dir = Path(__file__).parent.absolute()
-input_file = list(script_dir.glob("*.csv"))
+if not test_mode:
+    input_file = list(base_dir.glob("*.csv"))
+else:
+    input_file = [str(base_dir) + "/test/" + test_file_name]
 
 if len(input_file) == 1:
     target_csv = input_file[0]
@@ -255,7 +289,43 @@ if walls_extracted.isna().any():
         print(f"{item} is missing or wrong orientation")
     input("press ENTER to exit the program")
     sys.exit(1)
-check_smaller_than_1_1(walls)
+check_smaller_than_1_1(walls, 1)
+
+if use_win_sch:
+    if use_window_type:
+        wtypes = df
+        wtypes = wtypes[wtypes['Label'].str.split(split_chr).str[1:].str.join(split_chr).str.contains('wtype', case=False, na=False)]
+        wtypes = wtypes.reset_index(drop=True)
+        wtypes_extracted = wtypes['Label'].str.extract(r"wtype\s*(\S+)\s*", expand=False, flags=re.IGNORECASE)
+        wtypes_extracted = wtypes_extracted.dropna().unique().tolist()
+        invalid_items = []
+        for wtype in wtypes_extracted:
+            if wtype.lower() not in win_sch.keys():
+                invalid_items.append(wtype)
+        if invalid_items:
+            print("CRITICAL ERROR — window schedule missing:")
+            for item in invalid_items:
+                print(f"Not in schedule:  {item}")
+            input("\nPress ENTER to exit the program")
+            sys.exit(1)
+
+if use_door_sch:
+    if use_door_type:
+        dtypes = df
+        dtypes = dtypes[dtypes['Label'].str.split(split_chr).str[1:].str.join(split_chr).str.contains('dtype', case=False, na=False)]
+        dtypes = dtypes.reset_index(drop=True)
+        dtypes_extracted = dtypes['Label'].str.extract(r"dtype\s*(\S+)\s*", expand=False, flags=re.IGNORECASE)
+        dtypes_extracted = dtypes_extracted.dropna().unique().tolist()
+        invalid_items = []
+        for dtype in dtypes_extracted:
+            if dtype.lower() not in door_sch.keys():
+                invalid_items.append(dtype)
+        if invalid_items:
+            print("CRITICAL ERROR — door schedule missing:")
+            for item in invalid_items:
+                print(f"Not in schedule:  {item}")
+            input("\nPress ENTER to exit the program")
+            sys.exit(1)
 
 if use_wwr:
     walls_extracted_digits = walls['Label'].str.extract(r'_?\s*wall.*?(\d{3})\s*_?', expand=False, flags=re.IGNORECASE)
@@ -276,10 +346,14 @@ click_field("create_rooms_house_icon")
 
 for i in range(0, len(rooms)):
     print("")
+    print("--- new room ---")
+    print("")
     click_field("single_sheet_tab_button")
     click_field("single_sheet_new_room_button")
 
+    print("")
     print(rooms.at[i,'Label_Original'])
+    print("")
     update_field("single_sheet_room_description_inputfield", rooms.at[i,'Label_Original'])
 
     room_length = round(rooms.at[i,'Measurement']/10,2)
@@ -290,6 +364,7 @@ for i in range(0, len(rooms)):
         room_num = int(room_num.group(1))
         click_field("rooms_tab_button")
         update_field("rooms_duplicate_rooms_per_zone_inputfield", room_num)
+    print("")
 
     ### get details of the room
     base_label = re.escape(str(rooms.at[i, 'Label']))
@@ -316,7 +391,7 @@ for i in range(0, len(rooms)):
                 room_pop = None
 
             ### wall
-            if 'wall' in label and not any(x in label for x in ('win', 'window', 'door')):
+            if 'wall' in label and not any(x in label for x in ('win', 'window', 'wtype', 'door', 'dtype')):
                 click_field("walls_tab_button")
                 click_field("walls_new_wall_button")
                 wall_length = tdf.at[ii,'Measurement']
@@ -339,7 +414,7 @@ for i in range(0, len(rooms)):
 
             ### single windows
             if not use_wwr:
-                if any(x in label for x in ('win', 'window')):
+                if any(x in label for x in ('win', 'window', 'wtype')):
                     click_field("walls_new_opening_button")
                     click_field("walls_openings_window_checkbox")
                     click_field("walls_openings_length_checkbox")
@@ -354,24 +429,33 @@ for i in range(0, len(rooms)):
                             else:
                                 win_height = float(win_height.group(1))
 
-                            update_field("walls_openings_height_inputfield", win_height)
                             win_num = re.search(r"\s+x(\d+)", p)
-
                             if win_num != None:
                                 win_num = int(win_num.group(1))
                                 update_field("walls_openings_quantity_inputfield", win_num)
 
-                    win_length = tdf.at[ii,'Measurement']
+                            win_length = tdf.at[ii,'Measurement']
 
-                    if correct_win_length:
-                        win_length = min(win_sch_widths, key=lambda x: abs(x - win_length))
+                            if correct_win_length:
+                                win_length = min(win_sch_widths, key=lambda x: abs(x - win_length))
 
+                        elif 'wtype' in p:
+                            win_type = str(re.search(r"wtype\s*(\S+)\s*", p).group(1))
+                            win_height = win_sch[win_type]['H']
+                            win_length = win_sch[win_type]['W']
+                            
+                            win_num = re.search(r"\s+x(\d+)", p)
+                            if win_num != None:
+                                win_num = int(win_num.group(1))
+                                update_field("walls_openings_quantity_inputfield", win_num)
+
+                    update_field("walls_openings_height_inputfield", win_height)
                     update_field("walls_openings_length_inputfield", win_length)
 
-                    iii = p = win_height = win_num = win_length = None
+                    iii = p = win_height = win_num = win_length = win_type = None
 
             ### door
-            if 'door' in label:
+            if any(x in label for x in ('door', 'dtype')):
                 click_field("walls_new_opening_button")
                 click_field("walls_openings_door_checkbox")
                 click_field("walls_openings_length_checkbox")
@@ -386,21 +470,31 @@ for i in range(0, len(rooms)):
                         else:
                             door_height = float(door_height.group(1))
 
-                        update_field("walls_openings_height_inputfield", door_height)
                         door_num = re.search(r"\s+x(\d+)", p)
-
                         if door_num != None:
                             door_num = int(door_num.group(1))
                             update_field("walls_openings_quantity_inputfield", door_num)
 
-                door_length = tdf.at[ii,'Measurement']
+                        door_length = tdf.at[ii,'Measurement']
 
-                if correct_door_length:
-                    door_length = min(door_sch_widths, key=lambda x: abs(x - door_length))
+                        if correct_door_length:
+                            door_length = min(door_sch_widths, key=lambda x: abs(x - door_length))
+
+                    elif 'dtype' in p:
+                        door_type = str(re.search(r"dtype\s*(\S+)\s*", p).group(1))
+                        door_height = door_sch[door_type]['H']
+                        door_length = door_sch[door_type]['W']
+                        
+                        door_num = re.search(r"\s+x(\d+)", p)
+                        if door_num != None:
+                            door_num = int(door_num.group(1))
+                            update_field("walls_openings_quantity_inputfield", door_num)
+
                 update_field("walls_openings_length_inputfield", door_length)
+                update_field("walls_openings_height_inputfield", door_height)
 
-                iii = p = door_height = door_num = door_length = None
-
+                iii = p = door_height = door_num = door_length = door_type = None
+            print("")
     tdf = None
 
 print("")
@@ -413,7 +507,9 @@ print("="*30)
 print("")
 collector.display_summary()
 if not test_mode:
-    input("press ENTER to exit the program")
+    input("press ENTER 3 times to exit the program")
+    input("press ENTER 2 times to exit the program")
+    input("press ENTER 1 time to exit the program")
 print("|<|= =|>|")
 time.sleep(1)
 

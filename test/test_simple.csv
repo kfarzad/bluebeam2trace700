@@ -1,0 +1,11 @@
+Label,Measurement
+b1 l1 corridor east,20
+b1 l1 corridor east_pop,4
+b1 l1 corridor east_wall 270,74.6641
+b1 l1 corridor east_wall 270_door,6.1
+b1 l1 corridor east_wall 270_door h8.2,6.1
+b1 l1 corridor east_wall 270_win  x4,2.38
+b1 l1 corridor east_wall 270_win h6.5  x3,2.38
+b1 l1 corridor east_wall 270_window h9  x2,2.38
+b1 l1 corridor west x2,1000
+b1 l1 corridor west x2_wall ABCDE 090,2

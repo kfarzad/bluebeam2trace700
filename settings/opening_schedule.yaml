@@ -1,20 +1,29 @@
-use_opening_schedule: False
-
+use_window_schedule: False
+use_window_type: False
 correct_window_length: False
+
+use_door_schedule: False
+use_door_type: False
 correct_door_length: False
 
 window_schedule:
   window1:
-    H: 6
-    W: 6
-  window2:
-    H: 6
+    H: 7
     W: 3.2
+  A47:
+    H: 7
+    W: 4
+  A57:
+    H: 7
+    W: 5
 
 door_schedule:
   door1:
-    H: 3
-    W: 8
-  door2:
-    H: 5
-    W: 10
+    H: 9
+    W: 4
+  D5:
+    H: 9
+    W: 5
+  D6:
+    H: 9
+    W: 6
