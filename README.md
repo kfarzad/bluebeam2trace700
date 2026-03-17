@@ -26,10 +26,9 @@ This step allows the script to "see" where buttons are located in Trace 700.
 3. Go to the tools folder.
 4. When you run `create_button_map.py` program, it will ask you to click on different buttons in Trace 700 to calibrate.
    * ***Do not click anywhere else except the button that is asked for!***
-   * ***If Trace throws error, skip the error by hitting Enter, and NOT clicking!***
    * ***Do not double-click!***
    * ***Do not move python window!***
-   * *If you click the wrong spot, simply re-run the script.*
+   * *If you click the wrong spot, simply re-run the script, or keep going till the end, and ask Kiarash for a fix (there are tools to manually fix the missing clicks)*
 5. Now run `create_button_map.py`.
    * *You may need to try it few times to get the hang of it.*
 
@@ -39,7 +38,7 @@ This step allows the script to "see" where buttons are located in Trace 700.
 
 Drop your **BlueBeam output (CSV file)** into the project folder.
 
-* *The BlueBeam output must include "Label" column*
+* *The BlueBeam output must include "Label" and "Measurement" columns*
 * *For further notes on what to include in Label check Naming Scheme down below*
 
 ## 3. Run Automation
@@ -83,14 +82,24 @@ Looking for more? This program can automate the following:
 * **Rooms**
   * Create rooms and adjust sizes.
   * Adjust room multipliers (e.g., x3).
+    * Simply the first part of your name does the work; remember don't use "_" in your name.
 * **Population**
   * Add # of people to the room.
+    * Use "_pop".
 * **Walls**
   * Adjust wall lengths and orientations.
+    * Use "_wall ###".
 * **Windows**
   * **Manual:** Adjust quantity and size (matching the closest window size, use `settings/opening_schedule.yaml`).
   * **WWR:** Automate based on Window-to-Wall Ratios using `settings/window_to_wall_ratios.yaml` settings.
+    * Set `use_wwr: True`, and add the appropriate setting similar to examples. 
+  * **Schedule:** Use windows schedule to automatically set height and length of the windows.
+    * Use "_wtype X#".
 * **Doors**
-  * Adjust quantity and size (matching the closest door size, use `settings/opening_schedule.yaml`).
+  * **Manual:** Adjust quantity and size (matching the closest door size, use `settings/opening_schedule.yaml`).
+  * **Schedule:** Use door schedule to automatically set height and length of the doors.
+    * Use "_dtype X#".
+* **Default Values**
+  * Windows and Doors have default heights to be used in case of missing H info in the name.
 
 > **Try the Test File:** There is a sample file located in the `test` folder if you want to give it a try!

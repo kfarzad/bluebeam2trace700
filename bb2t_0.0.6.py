@@ -11,7 +11,7 @@ start_delay = 5 # in seconds
 
 ### test ground
 test_mode = False
-test_file_name = "test_"+ "wd_sch" + ".csv"
+test_file_name = "test_"+ "simple" + ".csv"
 
 ### Don't mess around below this line
 print("")
@@ -211,6 +211,22 @@ def check_smaller_than_1_1(measurement, multiplier=1):
         input("\nPress ENTER to exit the program")
         sys.exit(1)
 
+def check_for_duplicates(names):
+    counts = {}
+    for name in names:
+        counts[name] = counts.get(name, 0) + 1
+    
+    duplicates = [name for name, count in counts.items() if count > 1]
+
+    if duplicates:
+        print("CRITICAL ERROR — list contains duplicate entries:")
+        
+        for item in duplicates:
+            print(f"(Duplicate Found)  {item}")
+
+        input("\nPress ENTER to exit the program")
+        sys.exit(1)
+
 ### starting the code
 if not test_mode:
     countdown(start_delay, "Starting in")
@@ -239,10 +255,10 @@ if not 'Label' in cols:
         print(f"CRITICAL ERROR - input file does NOT have a Label or Subject column.")
         input("press ENTER to exit the program")
         sys.exit(1)
-elif 'Label' in cols and 'Subject' in cols:
-        print(f"CRITICAL ERROR - input file has both Label and Subject columns, please remove one.")
-        input("press ENTER to exit the program")
-        sys.exit(1) 
+# elif 'Label' in cols and 'Subject' in cols:
+#         print(f"CRITICAL ERROR - input file has both Label and Subject columns, please remove one.")
+#         input("press ENTER to exit the program")
+#         sys.exit(1) 
 
 df = df.dropna(subset=['Label'])
 df = df[~df['Label'].str.contains('guide', case=False, na=False)]
@@ -277,6 +293,7 @@ n_rooms = len(rooms)
 check_long_names(rooms['Label'])
 check_prohibited_chars(rooms['Label'], [".", ";", "\\", "'", '"'])
 check_smaller_than_1_1(rooms,10)
+check_for_duplicates(rooms['Label'])
 
 walls = df
 walls = walls[walls['Label'].str.split(split_chr).str[1:].str.join(split_chr).str.contains('wall', case=False, na=False)]
