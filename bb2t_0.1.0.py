@@ -11,7 +11,7 @@ start_delay = 5 # in seconds
 
 ### test ground
 test_mode = False
-test_file_name = "test_"+ "simple" + ".csv"
+test_file_name = "test_"+ "column" + ".csv"
 
 ### Don't mess around below this line
 print("")
@@ -62,6 +62,20 @@ def countdown(seconds=3, message="in"):
 ### read the settings
 base_dir = Path(__file__).parent.resolve()
 
+with open(base_dir / "settings/settings.yaml", "r") as f:
+    settings = yaml.safe_load(f)
+    operation_mode = settings["operation_mode"]
+    print(f"operation mode: {operation_mode}")
+    use_win_sch = settings["use_window_schedule"]
+    use_door_sch = settings["use_door_schedule"]
+    use_window_type = settings["use_window_type"]
+    use_door_type = settings["use_door_type"]
+    correct_win_length = settings["correct_window_length"]
+    correct_door_length = settings["correct_door_length"]
+    win_def_height = settings["default_window_height"]
+    door_def_height = settings["default_door_height"]
+    use_wwr = settings["use_window_to_wall_ratio"]
+
 if not test_mode:
     yaml_file_name = "button_map.yaml"
     yaml_paths = [
@@ -84,27 +98,15 @@ else:
     with open(str(yaml_path), "r") as f:
         bm = yaml.safe_load(f)
 
-with open(base_dir / "settings/window_to_wall_ratios.yaml", "r") as f:
-    wwr = yaml.safe_load(f)
-    use_wwr = wwr["use_wwr"]
-    if use_wwr:
-        print('using window to wall ratios')
-        wwr.pop("use_wwr")
-        print(wwr)
+if use_wwr:
+    print('using window to wall ratios')
+    with open(base_dir / "settings/schedule_window_to_wall_ratio.yaml", "r") as f:
+        wwr = yaml.safe_load(f)
         wwr_deg_list = pd.Series(list(wwr.keys())).str.extract(r'wwr\s?(\d{3})', expand=False).dropna().tolist()        # example: print(float(wwr["wwr"+"010"]))
-    else:
-        del wwr
 
-with open(base_dir / "settings/opening_schedule.yaml", "r") as f:
+with open(base_dir / "settings/schedule_opening.yaml", "r") as f:
     opn_sch = yaml.safe_load(f)
-    use_win_sch = opn_sch["use_window_schedule"]
-    use_door_sch = opn_sch["use_door_schedule"]
     if use_win_sch or use_door_sch:
-        use_window_type = opn_sch["use_window_type"]
-        use_door_type = opn_sch["use_door_type"]
-        correct_win_length = opn_sch["correct_window_length"]
-        correct_door_length = opn_sch["correct_door_length"]
-
         if use_window_type and correct_win_length:
             print("you cannot use both window length correction and window type selection together")
             input("press ENTER to exit the program")
@@ -136,12 +138,6 @@ with open(base_dir / "settings/opening_schedule.yaml", "r") as f:
     else:
         correct_win_length = False
         correct_door_length = False
-
-with open(base_dir / "settings/default_values.yaml", "r") as f:
-    default_values = yaml.safe_load(f)
-    win_def_height = default_values["default_window_height"]
-    door_def_height = default_values["default_door_height"]
-    # wall_def_orient = default_values["default_wall_orientation"]
 
 ### functions
 def update_field(input_button, input_text, mod=my_mod, speed=speed, lookup_table=bm):
@@ -245,114 +241,219 @@ else:
     input("press ENTER to exit the program")
     sys.exit(1)
 
-df = pd.read_csv(str(input_file[0]))
+if operation_mode == "Column":
 
-cols = df.columns.str.strip()
-if not 'Label' in cols:
-    if 'Subject' in cols:
-        df['Label'] = df['Subject']
-    else:
-        print(f"CRITICAL ERROR - input file does NOT have a Label or Subject column.")
-        input("press ENTER to exit the program")
-        sys.exit(1)
-# elif 'Label' in cols and 'Subject' in cols:
-#         print(f"CRITICAL ERROR - input file has both Label and Subject columns, please remove one.")
-#         input("press ENTER to exit the program")
-#         sys.exit(1) 
+    def get_multi(m):
+        return f" x{m}" if m != '1' else ""
+    
+    def get_window_suffix(row):
+        if pd.notnull(row['opening_type']) and row['opening_type'] != '':
+            return "_wtype" + " " + row['opening_type']
+        if pd.notnull(row['opening_height']) and row['opening_height'] != '':
+            return "_window h" + row['opening_height']
+        if (pd.isnull(row['opening_height']) or row['opening_height'] == '') and (pd.isnull(row['opening_type']) or row['opening_type'] == ''):
+            return "_window"
 
-df = df.dropna(subset=['Label'])
-df = df[~df['Label'].str.contains('guide', case=False, na=False)]
-df = df.reset_index(drop=True)
-df = df.sort_values(by=["Label"],ascending=[True])
-df['Label_Original'] = df['Label']  # Save for Trace700
-df['Label'] = df['Label'].str.lower() # Lowercase for logic
-df = round(df,1)
+    def get_door_suffix(row):
+        if pd.notnull(row['opening_type']) and row['opening_type'] != '':
+            return "_dtype" + " " + row['opening_type']
+        if pd.notnull(row['opening_height']) and row['opening_height'] != '':
+            return "_door h" + row['opening_height']
+        if (pd.isnull(row['opening_height']) or row['opening_height'] == '') and (pd.isnull(row['opening_type']) or row['opening_type'] == ''):
+            return "_door"
 
-if not 'Measurement' in cols:
-    if 'Area' in cols and 'Length' not in cols and 'Count' not in cols:
-        df['Measurement'] = df['Area']
-        if 'Area Unit' in cols:
-            df['Measurement Unit'] = df['Area Unit']
-    elif 'Length' in cols and 'Area' not in cols and 'Count' not in cols:
-        df['Measurement'] = df['Length']
-        if 'Length Unit' in cols:
-            df['Measurement Unit'] = df['Length Unit']
-    elif 'Count' in cols and 'Area' not in cols and 'Length' not in cols:
-        df['Measurement'] = df['Count']
-        if 'Count Unit' in cols:
-            df['Measurement Unit'] = df['Count Unit']  
-    else:
-        print(f"CRITICAL ERROR - input file has at least two of the following Area/Length/Count without Measurement columns,\nplease include Measurement column!")
-        input("press ENTER to exit the program")
-        sys.exit(1)
+    df = pd.read_csv(str(input_file[0]), dtype=str)
+    df = df.rename(columns={settings["column_names"]["level_number"]: 'level_number'})
+    df = df.rename(columns={settings["column_names"]["room_number"]: 'room_number'})
+    df = df.rename(columns={settings["column_names"]["room_name"]: 'room_name'})
+    df = df.rename(columns={settings["column_names"]["room_multiplier"]: 'room_multiplier'})
+    df = df.rename(columns={settings["column_names"]["takeoff_type"]: 'takeoff_type'})
+    df = df.rename(columns={settings["column_names"]["orientation"]: 'orientation'})
+    df = df.rename(columns={settings["column_names"]["opening_type"]: 'opening_type'})
+    df = df.rename(columns={settings["column_names"]["opening_height"]: 'opening_height'})
+    df = df.rename(columns={settings["column_names"]["opening_multiplier"]: 'opening_multiplier'})
 
-rooms = df
-rooms = rooms[~rooms['Label'].str.split(split_chr).str[1:].str.join(split_chr).str.contains('pop|wall|window|win|zone', case=False, na=False)]
-rooms = rooms.reset_index(drop=True)
-n_rooms = len(rooms)
-check_long_names(rooms['Label'])
-check_prohibited_chars(rooms['Label'], [".", ";", "\\", "'", '"'])
-check_smaller_than_1_1(rooms,10)
-check_for_duplicates(rooms['Label'])
+    rooms_df = df[df['takeoff_type'].astype(str).str.lower() == 'room'].copy()
+    rooms_df['Label'] = (
+        "L" + 
+        rooms_df['level_number'].astype(str) + " " + 
+        rooms_df['room_number'].astype(str) + " " + 
+        rooms_df['room_name'].astype(str) +
+        rooms_df['room_multiplier'].apply(get_multi)
+    )
+    rooms_df = rooms_df[['Label', 'Measurement']].copy()
 
-walls = df
-walls = walls[walls['Label'].str.split(split_chr).str[1:].str.join(split_chr).str.contains('wall', case=False, na=False)]
-walls = walls.reset_index(drop=True)
-walls_extracted = walls['Label'].str.extract(r'(_\s*wall.*?\d{3}\s*_?)', expand=False, flags=re.IGNORECASE)
-if walls_extracted.isna().any():
-    invalid_rows = walls[walls_extracted.isna()]['Label'].tolist()
-    print(f"CRITICAL ERROR")
-    for item in invalid_rows:
-        print(f"{item} is missing or wrong orientation")
-    input("press ENTER to exit the program")
-    sys.exit(1)
-check_smaller_than_1_1(walls, 1)
+    pop_df = df[df['takeoff_type'].astype(str).str.lower() == 'population'].copy()
+    pop_df['Label'] = (
+        "L" + 
+        pop_df['level_number'].astype(str) + " " + 
+        pop_df['room_number'].astype(str) + " " + 
+        pop_df['room_name'].astype(str) +
+        pop_df['room_multiplier'].apply(get_multi) + 
+        "_pop"
+    )
+    pop_df = pop_df[['Label', 'Measurement']].copy()
 
-if use_win_sch:
-    if use_window_type:
-        wtypes = df
-        wtypes = wtypes[wtypes['Label'].str.split(split_chr).str[1:].str.join(split_chr).str.contains('wtype', case=False, na=False)]
-        wtypes = wtypes.reset_index(drop=True)
-        wtypes_extracted = wtypes['Label'].str.extract(r"wtype\s*(\S+)\s*", expand=False, flags=re.IGNORECASE)
-        wtypes_extracted = wtypes_extracted.dropna().unique().tolist()
-        invalid_items = []
-        for wtype in wtypes_extracted:
-            if wtype.lower() not in win_sch.keys():
-                invalid_items.append(wtype)
-        if invalid_items:
-            print("CRITICAL ERROR — window schedule missing:")
-            for item in invalid_items:
-                print(f"Not in schedule:  {item}")
-            input("\nPress ENTER to exit the program")
+    walls_df = df[df['takeoff_type'].astype(str).str.lower() == 'wall'].copy()
+    walls_df['Label'] = (
+        "L" + 
+        walls_df['level_number'].astype(str) + " " + 
+        walls_df['room_number'].astype(str) + " " + 
+        walls_df['room_name'].astype(str) +
+        walls_df['room_multiplier'].apply(get_multi) + 
+        "_wall" +
+        walls_df['orientation'].astype(str)
+    )
+    walls_df = walls_df[['Label', 'Measurement']]
+
+    window_df = df[df['takeoff_type'].astype(str).str.lower() == 'window'].copy()
+    window_df['Label'] = (
+        "L" + 
+        window_df['level_number'].astype(str) + " " + 
+        window_df['room_number'].astype(str) + " " + 
+        window_df['room_name'].astype(str) +
+        window_df['room_multiplier'].apply(get_multi) + 
+        "_wall" +
+        window_df['orientation'].astype(str) +
+        window_df.apply(get_window_suffix, axis=1) +
+        window_df['opening_multiplier'].apply(get_multi)
+    )
+    window_df = window_df[['Label', 'Measurement']]
+
+    door_df = df[df['takeoff_type'].astype(str).str.lower() == 'door'].copy()
+    door_df['Label'] = (
+        "L" + 
+        door_df['level_number'].astype(str) + " " + 
+        door_df['room_number'].astype(str) + " " + 
+        door_df['room_name'].astype(str) +
+        door_df['room_multiplier'].apply(get_multi) + 
+        "_wall" +
+        door_df['orientation'].astype(str) +
+        door_df.apply(get_door_suffix, axis=1) +
+        door_df['opening_multiplier'].apply(get_multi)
+    )
+    door_df = door_df[['Label', 'Measurement']]
+
+    final_df = pd.concat([
+        rooms_df[['Label', 'Measurement']],
+        pop_df[['Label', 'Measurement']],
+        walls_df[['Label', 'Measurement']],
+        window_df[['Label', 'Measurement']]
+    ], ignore_index=True)
+    final_df['Measurement'] = pd.to_numeric(final_df['Measurement'], errors='coerce')
+
+    df = final_df
+    operation_mode = "Legacy"
+
+elif operation_mode == "Legacy":
+    df = pd.read_csv(str(input_file[0]))
+
+if operation_mode == "Legacy":
+
+    cols = df.columns.str.strip()
+    if not 'Label' in cols:
+        if 'Subject' in cols:
+            df['Label'] = df['Subject']
+        else:
+            print(f"CRITICAL ERROR - input file does NOT have a Label or Subject column.")
+            input("press ENTER to exit the program")
             sys.exit(1)
 
-if use_door_sch:
-    if use_door_type:
-        dtypes = df
-        dtypes = dtypes[dtypes['Label'].str.split(split_chr).str[1:].str.join(split_chr).str.contains('dtype', case=False, na=False)]
-        dtypes = dtypes.reset_index(drop=True)
-        dtypes_extracted = dtypes['Label'].str.extract(r"dtype\s*(\S+)\s*", expand=False, flags=re.IGNORECASE)
-        dtypes_extracted = dtypes_extracted.dropna().unique().tolist()
-        invalid_items = []
-        for dtype in dtypes_extracted:
-            if dtype.lower() not in door_sch.keys():
-                invalid_items.append(dtype)
-        if invalid_items:
-            print("CRITICAL ERROR — door schedule missing:")
-            for item in invalid_items:
-                print(f"Not in schedule:  {item}")
-            input("\nPress ENTER to exit the program")
+    df = df.dropna(subset=['Label'])
+    df = df[~df['Label'].str.contains('guide', case=False, na=False)]
+    df = df.reset_index(drop=True)
+    df = df.sort_values(by=["Label"],ascending=[True])
+    df['Label_Original'] = df['Label']  # Save for Trace700
+    df['Label'] = df['Label'].str.lower() # Lowercase for logic
+    df = round(df,1)
+
+    if not 'Measurement' in cols:
+        if 'Area' in cols and 'Length' not in cols and 'Count' not in cols:
+            df['Measurement'] = df['Area']
+            if 'Area Unit' in cols:
+                df['Measurement Unit'] = df['Area Unit']
+        elif 'Length' in cols and 'Area' not in cols and 'Count' not in cols:
+            df['Measurement'] = df['Length']
+            if 'Length Unit' in cols:
+                df['Measurement Unit'] = df['Length Unit']
+        elif 'Count' in cols and 'Area' not in cols and 'Length' not in cols:
+            df['Measurement'] = df['Count']
+            if 'Count Unit' in cols:
+                df['Measurement Unit'] = df['Count Unit']  
+        else:
+            print(f"CRITICAL ERROR - input file has at least two of the following Area/Length/Count without Measurement columns,\nplease include Measurement column!")
+            input("press ENTER to exit the program")
             sys.exit(1)
 
-if use_wwr:
-    walls_extracted_digits = walls['Label'].str.extract(r'_?\s*wall.*?(\d{3})\s*_?', expand=False, flags=re.IGNORECASE)
-    invalid_rows=walls[~walls_extracted_digits.isin(wwr_deg_list)]
-    if not len(invalid_rows) == 0:
+    rooms = df
+    rooms = rooms[~rooms['Label'].str.split(split_chr).str[1:].str.join(split_chr).str.contains('pop|wall|window|win|zone', case=False, na=False)]
+    rooms = rooms.reset_index(drop=True)
+    n_rooms = len(rooms)
+    check_long_names(rooms['Label'])
+    check_prohibited_chars(rooms['Label'], [".", ";", "\\", "'", '"'])
+    check_smaller_than_1_1(rooms,10)
+    check_for_duplicates(rooms['Label'])
+
+    walls = df
+    walls = walls[walls['Label'].str.split(split_chr).str[1:].str.join(split_chr).str.contains('wall', case=False, na=False)]
+    walls = walls.reset_index(drop=True)
+    walls_extracted = walls['Label'].str.extract(r'(_\s*wall.*?\d{3}\s*_?)', expand=False, flags=re.IGNORECASE)
+    if walls_extracted.isna().any():
+        invalid_rows = walls[walls_extracted.isna()]['Label'].tolist()
         print(f"CRITICAL ERROR")
-        for item in invalid_rows['Label']:
-            print(f"{item} is missing wwr orientation definition")
+        for item in invalid_rows:
+            print(f"{item} is missing or wrong orientation")
         input("press ENTER to exit the program")
         sys.exit(1)
+    check_smaller_than_1_1(walls, 1)
+
+    if use_win_sch:
+        if use_window_type:
+            wtypes = df
+            wtypes = wtypes[wtypes['Label'].str.split(split_chr).str[1:].str.join(split_chr).str.contains('wtype', case=False, na=False)]
+            wtypes = wtypes.reset_index(drop=True)
+            wtypes_extracted = wtypes['Label'].str.extract(r"wtype\s*(\S+)\s*", expand=False, flags=re.IGNORECASE)
+            wtypes_extracted = wtypes_extracted.dropna().unique().tolist()
+            invalid_items = []
+            for wtype in wtypes_extracted:
+                if wtype.lower() not in win_sch.keys():
+                    invalid_items.append(wtype)
+            if invalid_items:
+                print("CRITICAL ERROR — window schedule missing:")
+                for item in invalid_items:
+                    print(f"Not in schedule:  {item}")
+                input("\nPress ENTER to exit the program")
+                sys.exit(1)
+
+    if use_door_sch:
+        if use_door_type:
+            dtypes = df
+            dtypes = dtypes[dtypes['Label'].str.split(split_chr).str[1:].str.join(split_chr).str.contains('dtype', case=False, na=False)]
+            dtypes = dtypes.reset_index(drop=True)
+            dtypes_extracted = dtypes['Label'].str.extract(r"dtype\s*(\S+)\s*", expand=False, flags=re.IGNORECASE)
+            dtypes_extracted = dtypes_extracted.dropna().unique().tolist()
+            invalid_items = []
+            for dtype in dtypes_extracted:
+                if dtype.lower() not in door_sch.keys():
+                    invalid_items.append(dtype)
+            if invalid_items:
+                print("CRITICAL ERROR — door schedule missing:")
+                for item in invalid_items:
+                    print(f"Not in schedule:  {item}")
+                input("\nPress ENTER to exit the program")
+                sys.exit(1)
+
+    if use_wwr:
+        walls_extracted_digits = walls['Label'].str.extract(r'_?\s*wall.*?(\d{3})\s*_?', expand=False, flags=re.IGNORECASE)
+        invalid_rows=walls[~walls_extracted_digits.isin(wwr_deg_list)]
+        if not len(invalid_rows) == 0:
+            print(f"CRITICAL ERROR")
+            for item in invalid_rows['Label']:
+                print(f"{item} is missing wwr orientation definition")
+            input("press ENTER to exit the program")
+            sys.exit(1)
+elif operation_mode == "Column":
+    print("remove me")
 
 print("")
 print("")
@@ -430,6 +531,8 @@ for i in range(0, len(rooms)):
                 iii = wall_length = p = s = wall_direction = wall_length = None
 
             ### single windows
+            if use_wwr:
+                print("skipping single window for wwr")
             if not use_wwr:
                 if any(x in label for x in ('win', 'window', 'wtype')):
                     click_field("walls_new_opening_button")
@@ -527,6 +630,6 @@ if not test_mode:
     input("press ENTER 3 times to exit the program")
     input("press ENTER 2 times to exit the program")
     input("press ENTER 1 time to exit the program")
+
 print("|<|= =|>|")
 time.sleep(1)
-

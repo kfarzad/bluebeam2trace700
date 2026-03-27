@@ -1,11 +1,3 @@
-use_window_schedule: False
-use_window_type: False
-correct_window_length: False
-
-use_door_schedule: False
-use_door_type: False
-correct_door_length: False
-
 window_schedule:
   window1:
     H: 7

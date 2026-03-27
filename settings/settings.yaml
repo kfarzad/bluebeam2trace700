@@ -1,0 +1,32 @@
+operation_mode: Column # Legacy or Column
+
+use_window_schedule: True # True or False
+use_window_type: True # True or False
+use_door_schedule: True # True or False
+use_door_type: True # True or False
+use_window_to_wall_ratio: False # True or False
+
+default_window_height: 6.5 # (ft)
+default_door_height: 8 # (ft)
+
+# if your operation_mode is Column, set below:
+column_names: 
+  level_number: "Level #"
+  room_number: "Room #"
+  room_name: "Room Name"
+  room_multiplier: "Room Multiplier"
+  takeoff_type: "Type (Room.Population.Wall.Window.Door)"
+  orientation: "Orientation (###)"
+  opening_type: "Opening Type" # reference is defined in schedule_opening
+  opening_height: "Opening Height"
+  opening_multiplier: "Opening Multiplier"
+
+
+
+
+
+############
+# RARE USE #
+############
+correct_window_length: False
+correct_door_length: False

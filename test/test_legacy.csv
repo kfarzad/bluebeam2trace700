@@ -1,0 +1,11 @@
+﻿Label,Measurement,Measurement Unit
+A101 Lobby,461.49,sf
+A101 Lobby_pop,5,Count
+A101 Lobby_wall ABCDE 180,25.2396,"ft' in"""
+A101 Lobby_wall ABCDE 180_window h8 x2,7.5,"ft' in"""
+A-105 Community Room,470.81,sf
+A-105 Community Room_wall090,4.4471,"ft' in"""
+A-105 Community Room_wall135,17.4736,"ft' in"""
+A-105 Community Room_wall135_window,7.5,"ft' in"""
+A-105 Community Room_wall180,16.1493,"ft' in"""
+A-105 Community Room_wall180_window h8.5,5,"ft' in"""

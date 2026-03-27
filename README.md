@@ -38,8 +38,10 @@ This step allows the script to "see" where buttons are located in Trace 700.
 
 Drop your **BlueBeam output (CSV file)** into the project folder.
 
-* *The BlueBeam output must include "Label" and "Measurement" columns*
-* *For further notes on what to include in Label check Naming Scheme down below*
+* *The BlueBeam output (new column mode) must include several columns, check settings/settings.yaml for the necessary columns*
+* ***Restriction: No "_" usage within any columns.***
+* *The BlueBeam output (legacy mode) must include "Label" and "Measurement" columns*
+* *For further notes on what to include in Label check Legacy Naming Scheme down below*
 
 ## 3. Run Automation
 
@@ -51,7 +53,7 @@ Enjoy and sip your coffee while the automation handles the work! ☕
 
 ---
 
-## Naming Scheme
+## Legacy Naming Scheme
 
 To ensure the script parses your data correctly, follow this naming convention for your BlueBeam markup labels. You can also refer to the `b` file under the `b` folder for live examples.
 
@@ -92,7 +94,7 @@ Looking for more? This program can automate the following:
 * **Windows**
   * **Manual:** Adjust quantity and size (matching the closest window size, use `settings/opening_schedule.yaml`).
   * **WWR:** Automate based on Window-to-Wall Ratios using `settings/window_to_wall_ratios.yaml` settings.
-    * Set `use_wwr: True`, and add the appropriate setting similar to examples. 
+    * Set `use_wwr: True`, and add the appropriate setting similar to examples.
   * **Schedule:** Use windows schedule to automatically set height and length of the windows.
     * Use "_wtype X#".
 * **Doors**
