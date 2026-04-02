@@ -1,0 +1,11 @@
+Level #,Room #,Room Name,Qty,Takeoff Type (Room.Population.Wall.Window.Door),Orientation (###),Opening Type,Opening Height,Measurement,Measurement Unit,Subject
+1,A-105,Community Room,1,Room,,,,470.81,sf,Area Measurement
+1,A-105,Community Room,1,Wall,180,,,16.1493,"ft' in""",Length Measurement
+1,A-105,Community Room,1,Window,180,A47,,5,"ft' in""",Length Measurement
+1,A-105,Community Room,1,Wall,135,,,17.4736,"ft' in""",Length Measurement
+1,A-105,Community Room,1,Wall,90,,,4.4471,"ft' in""",Length Measurement
+1,A-105,Community Room,1,Window,135,,7.5,7.5,"ft' in""",Length Measurement
+1,A-101,Lobby,1,Room,,,,461.49,sf,Area Measurement
+1,A-101,Lobby,1,Wall,180,,,25.2396,"ft' in""",Length Measurement
+1,A-101,Lobby,1,Window,180,A57,,7.5,"ft' in""",Length Measurement
+1,A-101,Lobby,1,Population,,,,5,Count,Count Measurement

@@ -10,7 +10,7 @@ speed = 0.01 # 0.1
 start_delay = 5 # in seconds
 
 ### test ground
-test_mode = False
+test_mode = True
 test_file_name = "test_"+ "column" + ".csv"
 
 ### Don't mess around below this line
@@ -263,15 +263,24 @@ if operation_mode == "Column":
             return "_door"
 
     df = pd.read_csv(str(input_file[0]), dtype=str)
+
     df = df.rename(columns={settings["column_names"]["level_number"]: 'level_number'})
     df = df.rename(columns={settings["column_names"]["room_number"]: 'room_number'})
     df = df.rename(columns={settings["column_names"]["room_name"]: 'room_name'})
-    df = df.rename(columns={settings["column_names"]["room_multiplier"]: 'room_multiplier'})
     df = df.rename(columns={settings["column_names"]["takeoff_type"]: 'takeoff_type'})
     df = df.rename(columns={settings["column_names"]["orientation"]: 'orientation'})
     df = df.rename(columns={settings["column_names"]["opening_type"]: 'opening_type'})
     df = df.rename(columns={settings["column_names"]["opening_height"]: 'opening_height'})
-    df = df.rename(columns={settings["column_names"]["opening_multiplier"]: 'opening_multiplier'})
+    
+    if settings["column_names"]["room_multiplier"] == settings["column_names"]["opening_multiplier"]:
+        df[settings["column_names"]["room_multiplier"]+"2"] = df[settings["column_names"]["room_multiplier"]].copy()
+        df = df.rename(columns={settings["column_names"]["room_multiplier"]: 'room_multiplier'})
+        df = df.rename(columns={settings["column_names"]["opening_multiplier"]+"2": 'opening_multiplier'})
+    else:
+        df = df.rename(columns={settings["column_names"]["room_multiplier"]: 'room_multiplier'})
+        df = df.rename(columns={settings["column_names"]["opening_multiplier"]: 'opening_multiplier'})
+
+    df['orientation'] = df['orientation'].astype(str).str.zfill(3)
 
     rooms_df = df[df['takeoff_type'].astype(str).str.lower() == 'room'].copy()
     rooms_df['Label'] = (
