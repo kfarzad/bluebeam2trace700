@@ -10,7 +10,7 @@ speed = 0.01 # 0.1
 start_delay = 5 # in seconds
 
 ### test ground
-test_mode = True
+test_mode = False
 test_file_name = "test_"+ "column" + ".csv"
 
 ### Don't mess around below this line
