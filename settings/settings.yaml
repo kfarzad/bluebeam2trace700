@@ -1,4 +1,4 @@
-operation_mode: Column # Legacy or Column
+operation_mode: Legacy # Legacy or Column
 
 use_window_schedule: True # True or False
 use_window_type: True # True or False
@@ -14,12 +14,12 @@ column_names:
   level_number: "Level #"
   room_number: "Room #"
   room_name: "Room Name"
-  room_multiplier: "Qty" #"Room Multiplier"
+  room_multiplier: "Room Multiplier"
   takeoff_type: "Takeoff Type (Room.Population.Wall.Window.Door)"
   orientation: "Orientation (###)"
   opening_type: "Opening Type" # reference is defined in schedule_opening
   opening_height: "Opening Height"
-  opening_multiplier: "Qty" #"Opening Multiplier"
+  opening_multiplier: "Opening Multiplier"
 
 
 
